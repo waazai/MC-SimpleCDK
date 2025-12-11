@@ -4,17 +4,24 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as efs from 'aws-cdk-lib/aws-efs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as yaml from 'js-yaml';
-import * as fs from 'fs';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
+import * as fs from 'fs';
+import * as dotenv from 'dotenv';
 
 
-const mcImgConfig = yaml.load(fs.readFileSync('docker/mcSimple.yaml', 'utf-8')) as any;
+/**
+ * Creates a simple Minecraft server.
+ * Uses ECS to run the server and EFS to store the data.
+ * ASG to allow the server to be shutdown when not in use.
+ */
+
 
 export class McSimpleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const envConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
+    const mcConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
 
     /**
      * VPC
@@ -68,13 +75,18 @@ export class McSimpleStack extends cdk.Stack {
      */
     const asg = new AutoScalingGroup(this, 'TheAsg', {
       vpc,
-      instanceType: new ec2.InstanceType('t3.medium'),
+      instanceType: new ec2.InstanceType(`${envConfig.INSTANCE_TYPE}`),
       machineImage: ecs.EcsOptimizedImage.amazonLinux2(),
       userData: userData,
       minCapacity: 0,
       maxCapacity: 1,
     });
-    const capacityProvider = new ecs.AsgCapacityProvider(this, 'AsgCapacityProvider', {autoScalingGroup: asg});
+    const capacityProvider = new ecs.AsgCapacityProvider(this, 'AsgCapacityProvider', {
+      // prevent instance from being terminated
+      autoScalingGroup: asg,
+      enableManagedScaling: true,
+      enableManagedTerminationProtection: true
+    });
     cluster.addAsgCapacityProvider(capacityProvider);
     asg.role.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonElasticFileSystemClientFullAccess')
@@ -89,26 +101,27 @@ export class McSimpleStack extends cdk.Stack {
       securityGroupName: 'MCSimpleSG',
     });
 
-    cluster.connections.addSecurityGroup(sg);
+    asg.connections.addSecurityGroup(sg);
     fileSystem.connections.allowDefaultPortFrom(sg, 'Allow ECS access to EFS');
-    cluster.connections.allowFromAnyIpv4(ec2.Port.tcp(25565), 'Allow MC TCP Port');
+    asg.connections.allowFromAnyIpv4(ec2.Port.tcp(25565), 'Allow MC TCP Port');
 
 
     /**
      * Task Definition
      */
     const taskDef = new ecs.Ec2TaskDefinition(this, 'TheTaskDef', {
-      networkMode: ecs.NetworkMode.AWS_VPC,
+      networkMode: ecs.NetworkMode.BRIDGE,  // use network from ec2
     });
     const container = taskDef.addContainer('TheContainer', {
       image: ecs.ContainerImage.fromRegistry('itzg/minecraft-server'),
-      memoryLimitMiB: 3072,
-      cpu: 1024,
+      memoryLimitMiB: Number(`${envConfig.MEMORY_LIMIT}`),
+      cpu: Number(`${envConfig.CPU_LIMIT}`),
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'MCSimple' }),
-      environment: mcImgConfig.environment,
+      environment: mcConfig,
     });
     container.addPortMappings({
       containerPort: 25565,
+      hostPort: 25565,
       protocol: ecs.Protocol.TCP,
     });
     taskDef.addVolume({
@@ -125,8 +138,15 @@ export class McSimpleStack extends cdk.Stack {
     new ecs.Ec2Service(this, 'TheService', {
       cluster,
       taskDefinition: taskDef,
-      securityGroups: [sg],
       desiredCount: 1,
+      minHealthyPercent: 0,
+      maxHealthyPercent: 100,
+      capacityProviderStrategies: [
+        {
+          capacityProvider: capacityProvider.capacityProviderName,
+          weight: 1
+        }
+      ]
     });
 
   }

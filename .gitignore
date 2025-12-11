@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# CDK output
+cdk.out/
+
+# Environment Variables
+.env
+
+# System files
+.DS_Store
+Thumbs.db
