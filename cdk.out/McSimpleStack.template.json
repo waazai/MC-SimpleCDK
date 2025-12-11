@@ -1,0 +1,1053 @@
+{
+ "Resources": {
+  "TheVpc7ED17D3E": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.100.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/Resource"
+   }
+  },
+  "TheVpcPublicSubnetSubnet1Subnet24F04F8D": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-2a",
+    "CidrBlock": "10.100.0.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "PublicSubnet"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheVpc/PublicSubnetSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "TheVpc7ED17D3E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/PublicSubnetSubnet1/Subnet"
+   }
+  },
+  "TheVpcPublicSubnetSubnet1RouteTableE3561FC1": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheVpc/PublicSubnetSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "TheVpc7ED17D3E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/PublicSubnetSubnet1/RouteTable"
+   }
+  },
+  "TheVpcPublicSubnetSubnet1RouteTableAssociationCE1BA382": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "TheVpcPublicSubnetSubnet1RouteTableE3561FC1"
+    },
+    "SubnetId": {
+     "Ref": "TheVpcPublicSubnetSubnet1Subnet24F04F8D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/PublicSubnetSubnet1/RouteTableAssociation"
+   }
+  },
+  "TheVpcPublicSubnetSubnet1DefaultRoute61BC5120": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "TheVpcIGWF6739467"
+    },
+    "RouteTableId": {
+     "Ref": "TheVpcPublicSubnetSubnet1RouteTableE3561FC1"
+    }
+   },
+   "DependsOn": [
+    "TheVpcVPCGW9CFF63F9"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/PublicSubnetSubnet1/DefaultRoute"
+   }
+  },
+  "TheVpcPublicSubnetSubnet2Subnet41D008D3": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-2b",
+    "CidrBlock": "10.100.1.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "PublicSubnet"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheVpc/PublicSubnetSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "TheVpc7ED17D3E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/PublicSubnetSubnet2/Subnet"
+   }
+  },
+  "TheVpcPublicSubnetSubnet2RouteTable1FDA37F0": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheVpc/PublicSubnetSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "TheVpc7ED17D3E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/PublicSubnetSubnet2/RouteTable"
+   }
+  },
+  "TheVpcPublicSubnetSubnet2RouteTableAssociationF9AA450C": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "TheVpcPublicSubnetSubnet2RouteTable1FDA37F0"
+    },
+    "SubnetId": {
+     "Ref": "TheVpcPublicSubnetSubnet2Subnet41D008D3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/PublicSubnetSubnet2/RouteTableAssociation"
+   }
+  },
+  "TheVpcPublicSubnetSubnet2DefaultRoute06E4ED6D": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "TheVpcIGWF6739467"
+    },
+    "RouteTableId": {
+     "Ref": "TheVpcPublicSubnetSubnet2RouteTable1FDA37F0"
+    }
+   },
+   "DependsOn": [
+    "TheVpcVPCGW9CFF63F9"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/PublicSubnetSubnet2/DefaultRoute"
+   }
+  },
+  "TheVpcIGWF6739467": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/IGW"
+   }
+  },
+  "TheVpcVPCGW9CFF63F9": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "TheVpcIGWF6739467"
+    },
+    "VpcId": {
+     "Ref": "TheVpc7ED17D3E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/VPCGW"
+   }
+  },
+  "TheVpcRestrictDefaultSecurityGroupCustomResourceADABA22E": {
+   "Type": "Custom::VpcRestrictDefaultSG",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E",
+      "Arn"
+     ]
+    },
+    "DefaultSecurityGroupId": {
+     "Fn::GetAtt": [
+      "TheVpc7ED17D3E",
+      "DefaultSecurityGroup"
+     ]
+    },
+    "Account": "606891810428"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheVpc/RestrictDefaultSecurityGroupCustomResource/Default"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyName": "Inline",
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupEgress"
+         ],
+         "Resource": [
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:ec2:us-east-2:606891810428:security-group/",
+             {
+              "Fn::GetAtt": [
+               "TheVpc7ED17D3E",
+               "DefaultSecurityGroup"
+              ]
+             }
+            ]
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-606891810428-us-east-2",
+     "S3Key": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": "Lambda function for removing all inbound/outbound rules from the VPC default security group"
+   },
+   "DependsOn": [
+    "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+    "aws:asset:property": "Code"
+   }
+  },
+  "TheEfsC46110DF": {
+   "Type": "AWS::EFS::FileSystem",
+   "Properties": {
+    "Encrypted": true,
+    "FileSystemPolicy": {
+     "Statement": [
+      {
+       "Action": [
+        "elasticfilesystem:ClientRootAccess",
+        "elasticfilesystem:ClientWrite"
+       ],
+       "Condition": {
+        "Bool": {
+         "elasticfilesystem:AccessedViaMountTarget": "true"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "*"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "FileSystemTags": [
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheEfs"
+     }
+    ],
+    "LifecyclePolicies": [
+     {
+      "TransitionToIA": "AFTER_14_DAYS"
+     }
+    ],
+    "PerformanceMode": "generalPurpose"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheEfs/Resource"
+   }
+  },
+  "TheEfsEfsSecurityGroupA38331A5": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "McSimpleStack/TheEfs/EfsSecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheEfs"
+     }
+    ],
+    "VpcId": {
+     "Ref": "TheVpc7ED17D3E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheEfs/EfsSecurityGroup/Resource"
+   }
+  },
+  "TheEfsEfsSecurityGroupfromMcSimpleStackTheSecurityGroupE1F5B7F52049691C803A": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow ECS access to EFS",
+    "FromPort": 2049,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "TheEfsEfsSecurityGroupA38331A5",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "TheSecurityGroupC9867933",
+      "GroupId"
+     ]
+    },
+    "ToPort": 2049
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheEfs/EfsSecurityGroup/from McSimpleStackTheSecurityGroupE1F5B7F5:2049"
+   }
+  },
+  "TheEfsEfsMountTargetPublicSubnetSubnet1C6BCF580": {
+   "Type": "AWS::EFS::MountTarget",
+   "Properties": {
+    "FileSystemId": {
+     "Ref": "TheEfsC46110DF"
+    },
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "TheEfsEfsSecurityGroupA38331A5",
+       "GroupId"
+      ]
+     }
+    ],
+    "SubnetId": {
+     "Ref": "TheVpcPublicSubnetSubnet1Subnet24F04F8D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheEfs/EfsMountTarget-PublicSubnetSubnet1"
+   }
+  },
+  "TheEfsEfsMountTargetPublicSubnetSubnet2E5E48811": {
+   "Type": "AWS::EFS::MountTarget",
+   "Properties": {
+    "FileSystemId": {
+     "Ref": "TheEfsC46110DF"
+    },
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "TheEfsEfsSecurityGroupA38331A5",
+       "GroupId"
+      ]
+     }
+    ],
+    "SubnetId": {
+     "Ref": "TheVpcPublicSubnetSubnet2Subnet41D008D3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheEfs/EfsMountTarget-PublicSubnetSubnet2"
+   }
+  },
+  "ClusterEB0386A7": {
+   "Type": "AWS::ECS::Cluster",
+   "Properties": {
+    "ClusterName": "McSimpleStack-cluster",
+    "ClusterSettings": [
+     {
+      "Name": "containerInsights",
+      "Value": "enhanced"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/Cluster/Resource"
+   }
+  },
+  "Cluster3DA9CCBA": {
+   "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
+   "Properties": {
+    "CapacityProviders": [
+     {
+      "Ref": "AsgCapacityProvider760D11D9"
+     }
+    ],
+    "Cluster": {
+     "Ref": "ClusterEB0386A7"
+    },
+    "DefaultCapacityProviderStrategy": []
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/Cluster/Cluster"
+   }
+  },
+  "TheAsgInstanceSecurityGroup931623F4": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "McSimpleStack/TheAsg/InstanceSecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheAsg"
+     }
+    ],
+    "VpcId": {
+     "Ref": "TheVpc7ED17D3E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheAsg/InstanceSecurityGroup/Resource"
+   }
+  },
+  "TheAsgInstanceRole31535D2C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ec2.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/AmazonElasticFileSystemClientFullAccess"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "McSimpleStack/TheAsg"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheAsg/InstanceRole/Resource"
+   }
+  },
+  "TheAsgInstanceRoleDefaultPolicy67330A79": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecs:DeregisterContainerInstance",
+        "ecs:RegisterContainerInstance",
+        "ecs:Submit*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "ClusterEB0386A7",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "ecs:Poll",
+        "ecs:StartTelemetrySession"
+       ],
+       "Condition": {
+        "ArnEquals": {
+         "ecs:cluster": {
+          "Fn::GetAtt": [
+           "ClusterEB0386A7",
+           "Arn"
+          ]
+         }
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecs:DiscoverPollEndpoint",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "TheAsgInstanceRoleDefaultPolicy67330A79",
+    "Roles": [
+     {
+      "Ref": "TheAsgInstanceRole31535D2C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheAsg/InstanceRole/DefaultPolicy/Resource"
+   }
+  },
+  "TheAsgInstanceProfile440EAEE6": {
+   "Type": "AWS::IAM::InstanceProfile",
+   "Properties": {
+    "Roles": [
+     {
+      "Ref": "TheAsgInstanceRole31535D2C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheAsg/InstanceProfile"
+   }
+  },
+  "TheAsgLaunchTemplateC0804789": {
+   "Type": "AWS::EC2::LaunchTemplate",
+   "Properties": {
+    "LaunchTemplateData": {
+     "IamInstanceProfile": {
+      "Arn": {
+       "Fn::GetAtt": [
+        "TheAsgInstanceProfile440EAEE6",
+        "Arn"
+       ]
+      }
+     },
+     "ImageId": {
+      "Ref": "SsmParameterValueawsserviceecsoptimizedamiamazonlinux2recommendedimageidC96584B6F00A464EAD1953AFF4B05118Parameter"
+     },
+     "InstanceType": "t3.medium",
+     "Monitoring": {
+      "Enabled": false
+     },
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "TheAsgInstanceSecurityGroup931623F4",
+        "GroupId"
+       ]
+      }
+     ],
+     "TagSpecifications": [
+      {
+       "ResourceType": "instance",
+       "Tags": [
+        {
+         "Key": "Name",
+         "Value": "McSimpleStack/TheAsg/LaunchTemplate"
+        }
+       ]
+      },
+      {
+       "ResourceType": "volume",
+       "Tags": [
+        {
+         "Key": "Name",
+         "Value": "McSimpleStack/TheAsg/LaunchTemplate"
+        }
+       ]
+      }
+     ],
+     "UserData": {
+      "Fn::Base64": {
+       "Fn::Join": [
+        "",
+        [
+         "#!/bin/bash\necho ECS_CLUSTER=",
+         {
+          "Ref": "ClusterEB0386A7"
+         },
+         " >> /etc/ecs/ecs.config\nmkdir -p /mnt/efs\nmount -t efs ",
+         {
+          "Ref": "TheEfsC46110DF"
+         },
+         ":/ /mnt/efs\necho \"",
+         {
+          "Ref": "TheEfsC46110DF"
+         },
+         ":/ /mnt/efs efs defaults,_netdev 0 0\" >> /etc/fstab\necho ECS_CLUSTER=",
+         {
+          "Ref": "ClusterEB0386A7"
+         },
+         " >> /etc/ecs/ecs.config"
+        ]
+       ]
+      }
+     }
+    },
+    "TagSpecifications": [
+     {
+      "ResourceType": "launch-template",
+      "Tags": [
+       {
+        "Key": "Name",
+        "Value": "McSimpleStack/TheAsg/LaunchTemplate"
+       }
+      ]
+     }
+    ]
+   },
+   "DependsOn": [
+    "TheAsgInstanceRoleDefaultPolicy67330A79",
+    "TheAsgInstanceRole31535D2C"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheAsg/LaunchTemplate/Resource"
+   }
+  },
+  "TheAsgASG1C2E5D7B": {
+   "Type": "AWS::AutoScaling::AutoScalingGroup",
+   "Properties": {
+    "LaunchTemplate": {
+     "LaunchTemplateId": {
+      "Ref": "TheAsgLaunchTemplateC0804789"
+     },
+     "Version": {
+      "Fn::GetAtt": [
+       "TheAsgLaunchTemplateC0804789",
+       "LatestVersionNumber"
+      ]
+     }
+    },
+    "MaxSize": "1",
+    "MinSize": "0",
+    "NewInstancesProtectedFromScaleIn": true,
+    "Tags": [
+     {
+      "Key": "Name",
+      "PropagateAtLaunch": true,
+      "Value": "McSimpleStack/TheAsg"
+     }
+    ],
+    "VPCZoneIdentifier": [
+     {
+      "Ref": "TheVpcPublicSubnetSubnet1Subnet24F04F8D"
+     },
+     {
+      "Ref": "TheVpcPublicSubnetSubnet2Subnet41D008D3"
+     }
+    ]
+   },
+   "UpdatePolicy": {
+    "AutoScalingScheduledAction": {
+     "IgnoreUnmodifiedGroupSizeProperties": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheAsg/ASG"
+   }
+  },
+  "AsgCapacityProvider760D11D9": {
+   "Type": "AWS::ECS::CapacityProvider",
+   "Properties": {
+    "AutoScalingGroupProvider": {
+     "AutoScalingGroupArn": {
+      "Ref": "TheAsgASG1C2E5D7B"
+     },
+     "ManagedScaling": {
+      "Status": "ENABLED",
+      "TargetCapacity": 100
+     },
+     "ManagedTerminationProtection": "ENABLED"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/AsgCapacityProvider/AsgCapacityProvider"
+   }
+  },
+  "TheSecurityGroupC9867933": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "McSimpleStack/TheSecurityGroup",
+    "GroupName": "MCSimpleSG",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow MC TCP Port",
+      "FromPort": 25565,
+      "IpProtocol": "tcp",
+      "ToPort": 25565
+     }
+    ],
+    "VpcId": {
+     "Ref": "TheVpc7ED17D3E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheSecurityGroup/Resource"
+   }
+  },
+  "TheTaskDefTaskRole570DA6D1": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheTaskDef/TaskRole/Resource"
+   }
+  },
+  "TheTaskDef12D314F6": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Cpu": 1024,
+      "Environment": [
+       {
+        "Name": "AWS_REGION",
+        "Value": "us-east-2"
+       }
+      ],
+      "Essential": true,
+      "Image": "itzg/minecraft-server",
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "TheTaskDefTheContainerLogGroup48D489C6"
+        },
+        "awslogs-stream-prefix": "MCSimple",
+        "awslogs-region": "us-east-2"
+       }
+      },
+      "Memory": 3072,
+      "Name": "TheContainer",
+      "PortMappings": [
+       {
+        "ContainerPort": 25565,
+        "Protocol": "tcp"
+       }
+      ]
+     }
+    ],
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "TheTaskDefExecutionRole258A6787",
+      "Arn"
+     ]
+    },
+    "Family": "McSimpleStackTheTaskDef39C15B52",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "EC2"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "TheTaskDefTaskRole570DA6D1",
+      "Arn"
+     ]
+    },
+    "Volumes": [
+     {
+      "Host": {
+       "SourcePath": "/mnt/efs/mcdata"
+      },
+      "Name": "EfsVolume"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheTaskDef/Resource"
+   }
+  },
+  "TheTaskDefTheContainerLogGroup48D489C6": {
+   "Type": "AWS::Logs::LogGroup",
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheTaskDef/TheContainer/LogGroup/Resource"
+   }
+  },
+  "TheTaskDefExecutionRole258A6787": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheTaskDef/ExecutionRole/Resource"
+   }
+  },
+  "TheTaskDefExecutionRoleDefaultPolicyD920A76B": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "TheTaskDefTheContainerLogGroup48D489C6",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "TheTaskDefExecutionRoleDefaultPolicyD920A76B",
+    "Roles": [
+     {
+      "Ref": "TheTaskDefExecutionRole258A6787"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheTaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "TheService3273106B": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "Cluster": {
+     "Ref": "ClusterEB0386A7"
+    },
+    "DeploymentConfiguration": {
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 50
+    },
+    "DesiredCount": 1,
+    "EnableECSManagedTags": false,
+    "LaunchType": "EC2",
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "DISABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "TheSecurityGroupC9867933",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       {
+        "Ref": "TheVpcPublicSubnetSubnet1Subnet24F04F8D"
+       },
+       {
+        "Ref": "TheVpcPublicSubnetSubnet2Subnet41D008D3"
+       }
+      ]
+     }
+    },
+    "SchedulingStrategy": "REPLICA",
+    "TaskDefinition": {
+     "Ref": "TheTaskDef12D314F6"
+    }
+   },
+   "DependsOn": [
+    "TheTaskDefTaskRole570DA6D1"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/TheService/Service"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/81W227jNhD9luXjglEbo90HvylOsjCwjg3bDdAaRjCmxjLXFKny4tQV9O8FRcqSnewF2xbIgyHpzAznzPBw6EEyuP41+fkdPJsrlu2vBN8k1cIC21N4Nk8VskFSPZZsVRFeplmm0Rg0ZEjeE0oK+Cv9u/0wbiPRjpTc8txpsFxJMlxVhPFMT8Dso5uEAs8ilsfSAzO3EZyRel2v6WgrH2cjGqBF47WqCByAC9hwwe3xDyXbVQ4lG2fx3ee6EYrtTwTLsMi4nMpP4CTbkaHVDinh5eHD6MIdjOG5HJeHD7HSqRxpjKWQ96Smb4TFmyHyNlgEyQSh+Le5chaXsBHY4R2WGqMYbxY4OfuXsbSoJdqPYPEZjlGF8Su1FtiuQGnpApnT3B4/auXKVeVr7dqRZWOZe5ZzJ5AMV76Eqqb+sQVhcO292ghKQAj1nAoxdXajnMxCI77HhxLT5/HQHqvI4u4LJHzo+lWmFWEgx1JwiQEJWZiSEplvVnvQneR/OozbW19UF3aiz+wFENPSsPVLLEoBFlcVKYDtuMRxAXmrIy6NBckwDgkPZWiBC8wmSnKrNJc5GTbJLzrSsjWob8FCp6Zm87GVYBRVO5JKZadlv9qNl+ItHjg7jb2W1EyrLRctrz0eZ8B16ErThvMCa4pbk1T3XODiaCwWq/4mayzUAcRMCc6OZEi0r1ISSgTfIjsygSdTer+8mz9d//J0m/6+IJSUqLdKF57RRGWeTo4SNYiZ06UyGNl0if3XRDlpl6BztDVFZpJqJJyxqM9YsYA9dDObKemJoR5Lw/OdNY8DMiQodz591qovNfkISmDcHmdaHXiGOsgwCiTm6r1euvcOqaGvLNeEXmJ3bLAEs7/FLZfchzbKv/g1BM7d6KitqofdscECtd/3VT8yYjUFZ5VhILjMkyp1Vi3Cx+VYeFXEr0j9QqgFP9XX3bZniO91qZVFZh/weRyTmHutCk8Fx/7+bc/6b6fVwzYEdKnmqlPWqqp/xNC05bIBNeVQJJV3XlVEK4E9EYExrsDs5kiGvgQuGS9BpIx5UZ75+PiUdbP+xGLWRr3g2AzqMMdOtlPJXzV+fd1vWScgIcess5Cij6Q6lhD8/10Hfjianm/F/9bOdbhZBdKAhysoBgQNvVjnJZxlCwsW/a1rznr93fB/lbapJ5QS/iqc3QA1FSo3SfVJnU6/Rouy63u4D6K5rukcjXK6Gy1xvDhjVdG3hT5G4MLejr0bMEhTY9AuLORc5g1X0FBgnLFTZ0tnaypVhsln89NhMEgG18n1u8+G8yvtpOUFJvPw/Af/MHzjEgwAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "McSimpleStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "SsmParameterValueawsserviceecsoptimizedamiamazonlinux2recommendedimageidC96584B6F00A464EAD1953AFF4B05118Parameter": {
+   "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+   "Default": "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
+  },
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Outputs": {
+  "MCServerAddress": {
+   "Description": "Server Address",
+   "Value": {
+    "Fn::GetAtt": [
+     "TheSecurityGroupC9867933",
+     "GroupId"
+    ]
+   }
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

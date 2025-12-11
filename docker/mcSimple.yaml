@@ -1,0 +1,22 @@
+service:
+
+mcserver:
+  image: itzg/minecraft-server:latest
+  container_name: mc-simple
+  ports:
+    - "25565:25565"
+  volumes:
+    - mcserver-data:/data
+  restart: always
+
+  environment:
+    EULA: "TRUE"
+    MEMORY: "3G"
+
+    TYPE: "PAPER"
+    VERSION: "1.21.10"
+    SPIGET_RESOURCES: 59773,18494
+    
+    MOTD: "第一個家永遠都在"
+    DIFFICULTY: normal
+    MAX_PLAYERS: "20"
