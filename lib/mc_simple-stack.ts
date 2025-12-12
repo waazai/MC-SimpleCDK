@@ -4,10 +4,10 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as efs from 'aws-cdk-lib/aws-efs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
-import { cpus } from 'os';
 
 
 /**
@@ -30,6 +30,7 @@ export class McSimpleStack extends cdk.Stack {
     // default to 1.5GB memory and 1 vCPU to avoid cost
     const memoryLimit = Number(`${envConfig.MEMORY_LIMIT}`) ?? 1536;
     const cpuLimit = Number(`${envConfig.CPU_LIMIT}`) ?? 1024;
+    // do not need default MC config cause itzg/minecraft-server has its own default
     
 
     /**
@@ -128,7 +129,10 @@ export class McSimpleStack extends cdk.Stack {
       memoryLimitMiB: memoryLimit,
       cpu:cpuLimit,
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'MC-Simple' }),
-      environment: mcConfig,
+      environment: {
+        ...mcConfig,
+        EULA: 'TRUE'
+      },
     });
     container.addPortMappings({  // Minecraft default port
       containerPort: 25565,
@@ -146,7 +150,7 @@ export class McSimpleStack extends cdk.Stack {
     /**
      * Service: starts the container
      */
-    new ecs.Ec2Service(this, 'TheService', {
+    const service = new ecs.Ec2Service(this, 'TheService', {
       cluster,
       taskDefinition: taskDef,
       desiredCount: 1,   // default server start
@@ -160,5 +164,15 @@ export class McSimpleStack extends cdk.Stack {
       ]
     });
 
+
+    /**
+     * Lambda
+     */
+    // TODO
+
+
+
+
+    
   }
 }
