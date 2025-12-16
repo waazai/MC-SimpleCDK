@@ -1,8 +1,9 @@
-# Welcome to your CDK TypeScript project
+# Description
 
-This is a blank project for CDK development with TypeScript.
+<span style="font-size: 20px;">オギャッ🤗と生まれ🐣マイクラサーバー‼️🎊🎉</span>
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+A simple Minecraft server deployed on AWS using CDK.
+
 
 ## Requirments
 
@@ -24,3 +25,9 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 - Customize container image through env (or any config file), sticking with itzg/minecraft-server now
 - Often have issue on `cdk destroy` failed, things don't get cleaned up
 - Route 53 integration for DNS record (not needed so not doing this)
+
+## Reference
+* [vatertime/minecraft-spot-pricing](https://github.com/vatertime/minecraft-spot-pricing)
+* [AWS Documents](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html)
+* [Gemini sensei](https://gemini.google.com)
+* [平成ギャルズ!!!!](https://music.youtube.com/watch?v=4d-Chyd4Ij4)

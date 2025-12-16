@@ -5,6 +5,7 @@ import * as efs from 'aws-cdk-lib/aws-efs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
@@ -17,20 +18,24 @@ import * as dotenv from 'dotenv';
  */
 
 
+/**
+ * Get environment variables
+ * Default to small instance to avoid cost
+ * Default to 1.5GB memory and 1 vCPU to avoid cost
+ * Do not need default MC config cause itzg/minecraft-server has its own default
+ */
+const envConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
+const mcConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
+const instanceType = envConfig.INSTANCE_TYPE ?? 't3.small';
+const memoryLimit = Number(`${envConfig.MEMORY_LIMIT}`) ?? 1536;
+const cpuLimit = Number(`${envConfig.CPU_LIMIT}`) ?? 1024;
+
+
+
+
 export class McSimpleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-
-    const envConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
-    const mcConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
-    
-    // default a small instance to avoid cost
-    // t3.small is accutally pretty bad for MC performance
-    const instanceType = envConfig.INSTANCE_TYPE ?? 't3.small';
-    // default to 1.5GB memory and 1 vCPU to avoid cost
-    const memoryLimit = Number(`${envConfig.MEMORY_LIMIT}`) ?? 1536;
-    const cpuLimit = Number(`${envConfig.CPU_LIMIT}`) ?? 1024;
-    // do not need default MC config cause itzg/minecraft-server has its own default
     
 
     /**
@@ -168,11 +173,53 @@ export class McSimpleStack extends cdk.Stack {
     /**
      * Lambda
      */
-    // TODO
+    const serverSwitch = new lambda.Function(this, 'ServerSwitch', {
+      // turn the server on and off
+      runtime: lambda.Runtime.PYTHON_3_12,
+      handler: 'switch.handler',
+      code: lambda.Code.fromAsset('lambda'),
+      environment: {
+        CLUSTER_NAME: cluster.clusterName,
+        SERVICE_NAME: service.serviceName,
+      }
+      // maybe set a timeout if needed
+    });
 
 
+    /**
+     * API Gateway
+     */
+    const api = new apigateway.LambdaRestApi(this, 'ServerSwitchApi', {
+      handler: serverSwitch,
+      proxy: false
+    });
+    const switchResource = api.root.addResource('switch');
+    switchResource.addMethod('POST', new apigateway.LambdaIntegration(serverSwitch));
+
+    //IAM permissions
+    serverSwitch.addToRolePolicy(new iam.PolicyStatement({
+      actions: [
+        'ecs:UpdateService',  // update service
+        'ecs:DescribeServices',  // get current state
+
+        // get ip
+        'ecs:ListTasks',
+        'ecs:DescribeTasks',
+        'ecs:DescribeContainerInstances',
+        'ec2:DescribeInstances'
+      ],
+      resources: ['*'], // allow all resources
+    }));
 
 
-    
+    /**
+     * Outputs
+     */
+    new cdk.CfnOutput(this, 'ServerSwitchApiUrl', {
+      value: api.url,
+      description: 'URL to control the server'
+    });
+
+
   }
 }
