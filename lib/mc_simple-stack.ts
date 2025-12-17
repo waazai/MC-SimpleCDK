@@ -61,6 +61,21 @@ export class McSimpleStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       lifecyclePolicy: efs.LifecyclePolicy.AFTER_14_DAYS,
       performanceMode: efs.PerformanceMode.GENERAL_PURPOSE,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PUBLIC,
+      }
+    });
+    const accessPoint = fileSystem.addAccessPoint('TheAccessPoint', {
+      path: '/mcdata',
+      posixUser: {
+        uid: '1000',
+        gid: '1000'
+      },
+      createAcl: {
+        ownerUid: '1000',
+        ownerGid: '1000',
+        permissions: '755'
+      }
     });
 
 
@@ -70,7 +85,7 @@ export class McSimpleStack extends cdk.Stack {
     const cluster = new ecs.Cluster(this, 'Cluster', {
       vpc,
       clusterName: `${this.stackName}-cluster`,
-      containerInsightsV2: ecs.ContainerInsights.ENHANCED
+      containerInsightsV2: ecs.ContainerInsights.ENHANCED, 
     });
 
 
@@ -80,11 +95,17 @@ export class McSimpleStack extends cdk.Stack {
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
       `echo ECS_CLUSTER=${cluster.clusterName} >> /etc/ecs/ecs.config`,  // link to the cluster
-      // mount EFS
-      `mkdir -p /mnt/efs`,
-      `mount -t efs ${fileSystem.fileSystemId}:/ /mnt/efs`,
-      `echo "${fileSystem.fileSystemId}:/ /mnt/efs efs defaults,_netdev 0 0" >> /etc/fstab`
     );
+
+
+    /**
+     * Security Groups: access control
+     */
+    const sg = new ec2.SecurityGroup(this, 'TheSecurityGroup', {
+      vpc,
+      allowAllOutbound: true,
+      securityGroupName: 'MCSimpleSG',
+    });
 
 
     /**
@@ -97,6 +118,8 @@ export class McSimpleStack extends cdk.Stack {
       userData: userData,
       minCapacity: 0,  // do not need instance when server off
       maxCapacity: 1,  // only need up to 1 for server running
+      securityGroup: sg,
+      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
     });
     const capacityProvider = new ecs.AsgCapacityProvider(this, 'AsgCapacityProvider', {
       // prevent instance from being terminated
@@ -109,16 +132,6 @@ export class McSimpleStack extends cdk.Stack {
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonElasticFileSystemClientFullAccess')
     );
 
-
-    /**
-     * Security Groups: access control
-     */
-    const sg = new ec2.SecurityGroup(this, 'TheSecurityGroup', {
-      vpc,
-      allowAllOutbound: true,
-      securityGroupName: 'MCSimpleSG',
-    });
-    asg.connections.addSecurityGroup(sg);
     fileSystem.connections.allowDefaultPortFrom(sg, 'Allow ECS access to EFS');
     asg.connections.allowFromAnyIpv4(ec2.Port.tcp(25565), 'Allow MC TCP Port');
 
@@ -127,8 +140,21 @@ export class McSimpleStack extends cdk.Stack {
      * Task Definition: container settings
      */
     const taskDef = new ecs.Ec2TaskDefinition(this, 'TheTaskDef', {
-      networkMode: ecs.NetworkMode.BRIDGE,  // use network from ec2
+      networkMode: ecs.NetworkMode.BRIDGE,
     });
+    taskDef.addVolume({  // EFS Volume
+      name: 'mcdata',
+      efsVolumeConfiguration: {
+        fileSystemId: fileSystem.fileSystemId,
+        transitEncryption: 'ENABLED',
+        authorizationConfig: {
+          accessPointId: accessPoint.accessPointId,
+          iam: 'ENABLED'
+        }
+      }
+    });
+    fileSystem.grant(taskDef.taskRole, 'elasticfilesystem:ClientWrite', 'elasticfilesystem:ClientMount');
+
     const container = taskDef.addContainer('TheContainer', {
       image: ecs.ContainerImage.fromRegistry('itzg/minecraft-server'),
       memoryLimitMiB: memoryLimit,
@@ -139,16 +165,15 @@ export class McSimpleStack extends cdk.Stack {
         EULA: 'TRUE'
       },
     });
+    container.addMountPoints({
+      containerPath: '/data',
+      sourceVolume: 'mcdata',
+      readOnly: false
+    });
     container.addPortMappings({  // Minecraft default port
       containerPort: 25565,
       hostPort: 25565,
       protocol: ecs.Protocol.TCP,
-    });
-    taskDef.addVolume({  // EFS Volume
-      name: 'EfsVolume',
-      host: {
-        sourcePath: '/mnt/efs/mcdata',
-      },
     });
 
 
