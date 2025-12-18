@@ -6,6 +6,8 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
@@ -29,6 +31,9 @@ const mcConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
 const instanceType = envConfig.INSTANCE_TYPE ?? 't3.small';
 const memoryLimit = Number(`${envConfig.MEMORY_LIMIT}`) ?? 1536;
 const cpuLimit = Number(`${envConfig.CPU_LIMIT}`) ?? 1024;
+
+const serverTimeout = Number(`${envConfig.SERVER_TIMEOUT}`) ?? 10;
+const discordWebhookUrl = envConfig.DISCORD_WEBHOOK_URL ?? '';
 
 
 
@@ -84,8 +89,7 @@ export class McSimpleStack extends cdk.Stack {
      */
     const cluster = new ecs.Cluster(this, 'Cluster', {
       vpc,
-      clusterName: `${this.stackName}-cluster`,
-      containerInsightsV2: ecs.ContainerInsights.ENHANCED, 
+      clusterName: `${this.stackName}-cluster`
     });
 
 
@@ -198,8 +202,9 @@ export class McSimpleStack extends cdk.Stack {
     /**
      * Lambda
      */
+
+    // turn the server on and off
     const serverSwitch = new lambda.Function(this, 'ServerSwitch', {
-      // turn the server on and off
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: 'switch.handler',
       code: lambda.Code.fromAsset('lambda'),
@@ -210,6 +215,37 @@ export class McSimpleStack extends cdk.Stack {
       // maybe set a timeout if needed
     });
 
+    // notification
+    const notifyHook = new lambda.Function(this, 'Notification', {
+      runtime: lambda.Runtime.PYTHON_3_12,
+      handler: 'notifyHook.handler',
+      code: lambda.Code.fromAsset('lambda'),
+      environment: {
+        CLUSTER_NAME: cluster.clusterName,
+        SERVICE_NAME: service.serviceName,
+        DISCORD_WEBHOOK_URL: discordWebhookUrl,
+      }
+    });
+
+    // trigger when server status change
+    const serverStart = new events.Rule(this, 'ServerStart', {
+      eventPattern: {
+        source: ['aws.ecs'],
+        detailType: ['ECS Task State Change'],
+        detail: {
+          clusterArn: [cluster.clusterArn],
+          lastStatus: ['RUNNING'],
+          desiredStatus: ['RUNNING']
+        }
+      }
+    });
+    serverStart.addTarget(new targets.LambdaFunction(notifyHook));
+
+    // schedule check
+    const scheduledCheck = new events.Rule(this, 'ScheduledCheck', {
+      schedule: events.Schedule.rate(cdk.Duration.minutes(serverTimeout)),
+    });
+    scheduledCheck.addTarget(new targets.LambdaFunction(notifyHook));
 
     /**
      * API Gateway
@@ -236,6 +272,19 @@ export class McSimpleStack extends cdk.Stack {
       resources: ['*'], // allow all resources
     }));
 
+    notifyHook.addToRolePolicy(new iam.PolicyStatement({
+      actions: [
+        'ecs:UpdateService',  // update service
+        'ecs:DescribeServices',  // get current state
+
+        // get server ip
+        'ecs:ListTasks',
+        'ecs:DescribeTasks',
+        'ecs:DescribeContainerInstances',
+        'ec2:DescribeInstances'
+      ],
+      resources: ['*'], // allow all resources
+    }));
 
     /**
      * Outputs
