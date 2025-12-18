@@ -5,8 +5,12 @@ from discord_webhook import DiscordWebhook
 from mcstatus import JavaServer
 from switch import get_server_ip
 
-ECS_CLUSTER = os.environ['CLUSTER_NAME']
-SERVICE_NAME = os.environ['SERVICE_NAME']
+# initialize AWS clients
+ecs = boto3.client('ecs')
+
+# get environment variables
+CLUSTER = os.environ['CLUSTER_NAME']
+SERVICE = os.environ['SERVICE_NAME']
 DISCORD_WEBHOOK_URL = os.environ['DISCORD_WEBHOOK_URL']
 
 def handler(event, context):
