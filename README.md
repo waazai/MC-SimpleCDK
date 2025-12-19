@@ -21,6 +21,12 @@ A simple Minecraft server deployed on AWS using CDK.
 5. Deploy the stack
 `cdk deploy`
 
+- Sever will be up by default, ip will be sent to discord webhook.
+- Else check it in aws console.
+- Set server timeout in .env to empty if you want the server always up.
+- You will get something like `https://****/prod/` in the output, append `switch` to the url.
+- http post `{"action": "start"}` or `{"action": "stop"}` to start or stop the server.
+
 ## TODO/Issues
 
 - configure webhook, pretty annoying in chat channel<- will work on this shortly

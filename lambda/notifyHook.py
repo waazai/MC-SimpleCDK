@@ -28,8 +28,8 @@ def handler(event, context):
         try:
             ip = get_server_ip()
             if str(ip):
-                webhook_msg(f"Server started: {str(ip)}")
-            print(f"Server started: {ip}")
+                webhook_msg(f"Server starting: {str(ip)}")
+            print(f"Server starting: {ip}")
             return {"status": "started_notification_sent"}
         except Exception as e:
             print(f"Error: {str(e)}")
