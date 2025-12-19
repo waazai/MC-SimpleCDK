@@ -3,6 +3,9 @@ import os
 import json
 from discord_webhook import DiscordWebhook
 from mcstatus import JavaServer
+import datetime
+from dateutil.tz import tzutc
+
 from switch import get_server_ip
 
 # initialize AWS clients

@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk", 
-    "postinstall": "pip install -r lambda/requirements.txt"
+    "postinstall": "pip install -r --user lambda/requirements.txt"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
