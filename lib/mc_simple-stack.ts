@@ -29,10 +29,10 @@ import * as dotenv from 'dotenv';
 const envConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
 const mcConfig = dotenv.parse(fs.readFileSync('.env', 'utf-8'));
 const instanceType = envConfig.INSTANCE_TYPE ?? 't3.small';
-const memoryLimit = Number(`${envConfig.MEMORY_LIMIT}`) ?? 1536;
-const cpuLimit = Number(`${envConfig.CPU_LIMIT}`) ?? 1024;
+const memoryLimit = Number(`${envConfig.MEMORY_LIMIT}`) ?? 1536;  // at least 1.5GB
+const cpuLimit = Number(`${envConfig.CPU_LIMIT}`) ?? 2048;  // at least 2 vCPU
 
-const serverTimeout = Number(`${envConfig.SERVER_TIMEOUT}`) ?? 10;
+const serverTimeout = Number(`${envConfig.SERVER_TIMEOUT}`) ?? -1;  // -1 means no timeout
 const discordWebhookUrl = envConfig.DISCORD_WEBHOOK_URL ?? '';
 
 
@@ -89,7 +89,8 @@ export class McSimpleStack extends cdk.Stack {
      */
     const cluster = new ecs.Cluster(this, 'Cluster', {
       vpc,
-      clusterName: `${this.stackName}-cluster`
+      clusterName: `${this.stackName}-cluster`,
+      containerInsights: false
     });
 
 
@@ -243,7 +244,7 @@ export class McSimpleStack extends cdk.Stack {
 
     // schedule check
     const scheduledCheck = new events.Rule(this, 'ScheduledCheck', {
-      schedule: events.Schedule.rate(cdk.Duration.minutes(serverTimeout)),
+      schedule: serverTimeout == -1 ? undefined : events.Schedule.rate(cdk.Duration.minutes(serverTimeout)),
     });
     scheduledCheck.addTarget(new targets.LambdaFunction(notifyHook));
 
@@ -293,6 +294,29 @@ export class McSimpleStack extends cdk.Stack {
       value: api.url,
       description: 'URL to control the server'
     });
+
+
+    /**
+     * file browser
+     * use this when need to upload files
+     * make sure to have enought cpu and memory
+     */
+    // const fileBrowser = taskDef.addContainer('FileBrowser', {
+    //   image: ecs.ContainerImage.fromRegistry('filebrowser/filebrowser'),
+    //   memoryLimitMiB: 256,
+    //   logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'FileBrowser' }),
+    // });
+    // fileBrowser.addMountPoints({
+    //   containerPath: '/srv',
+    //   sourceVolume: 'mcdata',
+    //   readOnly: false
+    // });
+    // fileBrowser.addPortMappings({
+    //   containerPort: 80,
+    //   hostPort: 8080,
+    //   protocol: ecs.Protocol.TCP,
+    // });
+    // asg.connections.allowFromAnyIpv4(ec2.Port.tcp(8080), 'Allow FileBrowser access');
 
 
   }

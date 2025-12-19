@@ -23,13 +23,14 @@ A simple Minecraft server deployed on AWS using CDK.
 
 ## TODO/Issues
 
-- Customize webhook <- will work on this shortly
-- Shuts down the server whenever a scheduled check is triggered, maybe add a flag for timing
+- configure webhook, pretty annoying in chat channel<- will work on this shortly
+- python dependencies are installed in an ugly way, fix this with some cdk toolkit
 
 - CloudWatch Logs (leaving the errors mysterious)
 - Customize container image through env (or any config file), sticking with itzg/minecraft-server now
 - Often have issue on `cdk destroy` failed, things don't get cleaned up
 - Route 53 integration for DNS record (not needed so not doing this)
+
 - Sever start and shutdown takes a while
 
 ## Reference
